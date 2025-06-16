@@ -1,0 +1,947 @@
+app:
+  description: ''
+  icon: fox_face
+  icon_background: '#D1E0FF'
+  mode: advanced-chat
+  name: 會議室小幫手
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/ollama:0.0.3@9ded90ac00e8510119a24be7396ba77191c9610d5e1e29f59d68fa1229822fc7
+kind: app
+version: 0.3.0
+workflow:
+  conversation_variables:
+  - description: Usage of the meeting room
+    id: fba87dac-1edf-4534-8d14-3329f5b648b9
+    name: meeting_room_info
+    selector:
+    - conversation
+    - meeting_room_info
+    value: ''
+    value_type: string
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_size_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: '您好！我是艾麗，很高興能幫助您預訂會議室。請告訴我您需要預訂會議室的日期和時間。
+
+      查詢當天會議室的使用狀態，請輸入日期，範例格式為: 2024/01/01'
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        sourceType: parameter-extractor
+        targetType: tool
+      id: 1726800387083-source-1726800362887-target
+      selected: false
+      source: '1726800387083'
+      sourceHandle: source
+      target: '1726800362887'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: start
+        targetType: if-else
+      id: 1726800134261-source-1726802389135-target
+      selected: false
+      source: '1726800134261'
+      sourceHandle: source
+      target: '1726802389135'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: parameter-extractor
+      id: 1726802389135-true-1726800387083-target
+      selected: false
+      source: '1726802389135'
+      sourceHandle: 'true'
+      target: '1726800387083'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: llm
+      id: 1726802389135-false-1726993946195-target
+      selected: false
+      source: '1726802389135'
+      sourceHandle: 'false'
+      target: '1726993946195'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: parameter-extractor
+        targetType: if-else
+      id: 1726994039878-source-1726803961105-target
+      selected: false
+      source: '1726994039878'
+      sourceHandle: source
+      target: '1726803961105'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: parameter-extractor
+        targetType: parameter-extractor
+      id: 1726994112587-source-1726994039878-target
+      selected: false
+      source: '1726994112587'
+      sourceHandle: source
+      target: '1726994039878'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: parameter-extractor
+        targetType: parameter-extractor
+      id: 1726994159077-source-1726994208040-target
+      selected: false
+      source: '1726994159077'
+      sourceHandle: source
+      target: '1726994208040'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: parameter-extractor
+        targetType: parameter-extractor
+      id: 1726994208040-source-1726994236981-target
+      selected: false
+      source: '1726994208040'
+      sourceHandle: source
+      target: '1726994236981'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: parameter-extractor
+        targetType: parameter-extractor
+      id: 1726994236981-source-1726994112587-target
+      selected: false
+      source: '1726994236981'
+      sourceHandle: source
+      target: '1726994112587'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: answer
+      id: 1726803961105-false-1726802591256-target
+      selected: false
+      source: '1726803961105'
+      sourceHandle: 'false'
+      target: '1726802591256'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: tool
+        targetType: code
+      id: 1726800362887-source-1726998525575-target
+      selected: false
+      source: '1726800362887'
+      sourceHandle: source
+      target: '1726998525575'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: code
+        targetType: assigner
+      id: 1726998525575-source-1726999289105-target
+      selected: false
+      source: '1726998525575'
+      sourceHandle: source
+      target: '1726999289105'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: parameter-extractor
+      id: 1726993946195-source-1726994159077-target
+      selected: false
+      source: '1726993946195'
+      sourceHandle: source
+      target: '1726994159077'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: tool
+      id: 1726803961105-true-1727004663561-target
+      selected: false
+      source: '1726803961105'
+      sourceHandle: 'true'
+      target: '1727004663561'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: tool
+        targetType: answer
+      id: 1727004663561-source-1726811660278-target
+      selected: false
+      source: '1727004663561'
+      sourceHandle: source
+      target: '1726811660278'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: assigner
+        targetType: llm
+      id: 1726999289105-source-1727079229035-target
+      selected: false
+      source: '1726999289105'
+      sourceHandle: source
+      target: '1727079229035'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: answer
+      id: 1727079229035-source-1726800831619-target
+      source: '1727079229035'
+      sourceHandle: source
+      target: '1726800831619'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: ''
+        selected: false
+        title: 開始
+        type: start
+        variables: []
+      height: 64
+      id: '1726800134261'
+      position:
+        x: 174.2319002412902
+        y: 266
+      positionAbsolute:
+        x: 174.2319002412902
+        y: 266
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        desc: ''
+        provider_id: e29e3e68-1b67-47aa-bc47-e4c0318d6678
+        provider_name: 會議室查詢
+        provider_type: workflow
+        selected: false
+        title: 會議室查詢
+        tool_configurations: {}
+        tool_label: 會議室查詢
+        tool_name: Meeting_Enquiry
+        tool_parameters:
+          date:
+            type: mixed
+            value: '{{#1726800387083.date#}}'
+        type: tool
+      height: 64
+      id: '1726800362887'
+      position:
+        x: 985.4671480179231
+        y: 266
+      positionAbsolute:
+        x: 985.4671480179231
+        y: 266
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        desc: ''
+        instruction: '找到日期,範例格式為2024/01/01
+
+          若沒有年份,補上2024'
+        model:
+          completion_params:
+            temperature: 0.1
+          mode: chat
+          name: gemma2:27b
+          provider: langgenius/ollama/ollama
+        parameters:
+        - description: 查詢日期
+          name: date
+          required: false
+          type: string
+        query:
+        - sys
+        - query
+        reasoning_mode: prompt
+        selected: false
+        title: 參數提取器
+        type: parameter-extractor
+        variables: []
+      height: 109
+      id: '1726800387083'
+      position:
+        x: 719.0069576697658
+        y: 266
+      positionAbsolute:
+        x: 719.0069576697658
+        y: 266
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        answer: '{{#1727079229035.text#}}'
+        desc: ''
+        selected: false
+        title: 會議室狀態
+        type: answer
+        variables: []
+      height: 121
+      id: '1726800831619'
+      position:
+        x: 1746.3589664390088
+        y: 373.8478319377796
+      positionAbsolute:
+        x: 1746.3589664390088
+        y: 373.8478319377796
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: empty
+            id: 7acd1331-43a3-455a-977b-142ee820072c
+            value: ''
+            varType: string
+            variable_selector:
+            - conversation
+            - meeting_room_info
+          id: 'true'
+          logical_operator: and
+        desc: ''
+        selected: false
+        title: 條件分支
+        type: if-else
+      height: 154
+      id: '1726802389135'
+      position:
+        x: 452.5467673216084
+        y: 266
+      positionAbsolute:
+        x: 452.5467673216084
+        y: 266
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        answer: '{{#1726993946195.text#}}'
+        desc: ''
+        selected: false
+        title: 確認資訊
+        type: answer
+        variables: []
+      height: 121
+      id: '1726802591256'
+      position:
+        x: 1613.4400376675853
+        y: 643.967883861427
+      positionAbsolute:
+        x: 1613.4400376675853
+        y: 643.967883861427
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: not empty
+            id: d8f7a645-1ab5-4e40-957d-373969078e72
+            value: ''
+            varType: string
+            variable_selector:
+            - '1726994159077'
+            - start_date
+          - comparison_operator: not empty
+            id: 636d65de-34d3-423c-8d53-aef446a61de6
+            value: ''
+            varType: string
+            variable_selector:
+            - '1726994208040'
+            - room_number
+          - comparison_operator: not empty
+            id: d8d313eb-dc30-42ec-8efa-8d72d74c88e4
+            value: ''
+            varType: string
+            variable_selector:
+            - '1726994236981'
+            - meeting_subject
+          - comparison_operator: not empty
+            id: 59e4c49e-60f0-4783-8a76-d635309f6fdd
+            value: ''
+            varType: string
+            variable_selector:
+            - '1726994112587'
+            - time_from
+          - comparison_operator: not empty
+            id: 0c10da2c-5624-45b0-9b8d-c516380484a3
+            value: ''
+            varType: string
+            variable_selector:
+            - '1726994039878'
+            - time_to
+          id: 'true'
+          logical_operator: and
+        desc: ''
+        selected: false
+        title: 確認資訊是否完整
+        type: if-else
+      height: 284
+      id: '1726803961105'
+      position:
+        x: 1253.4285714285716
+        y: 470.4980397391055
+      positionAbsolute:
+        x: 1253.4285714285716
+        y: 470.4980397391055
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        answer: '{{#1727004663561.text#}}'
+        desc: ''
+        selected: false
+        title: api回覆結果
+        type: answer
+        variables: []
+      height: 121
+      id: '1726811660278'
+      position:
+        x: 1608.2312902090694
+        y: 520.9598784973088
+      positionAbsolute:
+        x: 1608.2312902090694
+        y: 520.9598784973088
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - conversation
+          - meeting_room_info
+        desc: ''
+        memory:
+          query_prompt_template: ''
+          role_prefix:
+            assistant: ''
+            user: ''
+          window:
+            enabled: false
+            size: 50
+        model:
+          completion_params:
+            temperature: 0
+          mode: chat
+          name: gemma2:27b
+          provider: langgenius/ollama/ollama
+        prompt_template:
+        - id: 01cb7e0b-8840-4cd8-bbd2-47a334ccd662
+          role: system
+          text: '您的任務是協助訂會議室，您的名字是艾麗。
+
+
+            您要與使用者進行對話，協助他們預訂會議室。
+
+
+            若要預訂會議室，您需要下列資訊：借用日期(start_date)、會議號碼(meeting_room)、會議名稱(meeting_subject)、借用時間(time_from)、結束時間(time_to)。
+
+
+            收集完資訊後，請以下列格式提供輸出: ''我將幫您預訂會議室，請確認以下資訊：
+
+            借用日期(start_date):xxxx/xx/xx
+
+            會議室(meeting_room):xxxx
+
+            會議名稱(meeting_subject):xxxxxx
+
+            借用時間(time_from):xxxxx
+
+            結束時間(time_to):xxxxx''
+
+
+            會議室的可借用時間為9:00至18:00，其餘時間不提供借用。共有7間會議室：3303、3304、3305、3307、3309、3310、3311。請根據會議室借用狀態{{{#context#}}}，逐步推理回答問題，沒有標籤的時段代表是空閒的可以借用，不用回答無法借用的時段。'
+        selected: false
+        title: 艾麗助手
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 109
+      id: '1726993946195'
+      position:
+        x: 719.0069576697658
+        y: 436.0083957075574
+      positionAbsolute:
+        x: 719.0069576697658
+        y: 436.0083957075574
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        desc: ''
+        instruction: '從輸入中找到使用者要借用會議室的結束時間(time_to)
+
+          輸出格式是"xx:xx",若沒有資訊則輸出空值'
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gemma2:27b
+          provider: langgenius/ollama/ollama
+        parameters:
+        - description: time_to
+          name: time_to
+          required: false
+          type: string
+        query:
+        - sys
+        - query
+        reasoning_mode: prompt
+        selected: false
+        title: time_to
+        type: parameter-extractor
+        variables: []
+      height: 109
+      id: '1726994039878'
+      position:
+        x: 988.6137723840855
+        y: 723.3351656639798
+      positionAbsolute:
+        x: 988.6137723840855
+        y: 723.3351656639798
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        desc: ''
+        instruction: '從輸入中找到使用者要借用會議室的借用時間(time_from)
+
+          輸出格式是"xx:xx",若沒有資訊則輸出空值'
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gemma2:27b
+          provider: langgenius/ollama/ollama
+        parameters:
+        - description: time_from
+          name: time_from
+          required: false
+          type: string
+        query:
+        - sys
+        - query
+        reasoning_mode: prompt
+        selected: false
+        title: time_from
+        type: parameter-extractor
+        variables: []
+      height: 109
+      id: '1726994112587'
+      position:
+        x: 988.6137723840855
+        y: 632.0798242789858
+      positionAbsolute:
+        x: 988.6137723840855
+        y: 632.0798242789858
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        desc: ''
+        instruction: '從輸入中找到使用者要借用會議室的借用日期(start_date)
+
+          輸出格式是"xxxx/xx/xx",若沒有年份則補上2024,若沒有資訊則輸出空值'
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gemma2:27b
+          provider: langgenius/ollama/ollama
+        parameters:
+        - description: start_date
+          name: start_date
+          required: false
+          type: string
+        query:
+        - sys
+        - query
+        reasoning_mode: prompt
+        selected: false
+        title: start_date
+        type: parameter-extractor
+        variables: []
+      height: 109
+      id: '1726994159077'
+      position:
+        x: 988.6137723840855
+        y: 338.2567262564588
+      positionAbsolute:
+        x: 988.6137723840855
+        y: 338.2567262564588
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        desc: ''
+        instruction: '從輸入中找到使用者要借用會議室的會議室(meeting_room)
+
+          輸出格式是"xxxx",若沒有資訊則輸出空值
+
+          共有7間會議室：3303、3304、3305、3307、3309、3310、3311。'
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gemma2:27b
+          provider: langgenius/ollama/ollama
+        parameters:
+        - description: room_number
+          name: room_number
+          required: false
+          type: string
+        query:
+        - sys
+        - query
+        reasoning_mode: prompt
+        selected: false
+        title: room_number
+        type: parameter-extractor
+        variables: []
+      height: 109
+      id: '1726994208040'
+      position:
+        x: 988.6137723840855
+        y: 436.0083957075574
+      positionAbsolute:
+        x: 988.6137723840855
+        y: 436.0083957075574
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        desc: ''
+        instruction: '從輸入中找到使用者要借用會議室的會議名稱(meeting_subject)
+
+          輸出格式是"xxxxxx",若沒有資訊則輸出空值'
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gemma2:27b
+          provider: langgenius/ollama/ollama
+        parameters:
+        - description: meeting_subject
+          name: meeting_subject
+          required: false
+          type: string
+        query:
+        - sys
+        - query
+        reasoning_mode: prompt
+        selected: false
+        title: meeting_subject
+        type: parameter-extractor
+        variables: []
+      height: 109
+      id: '1726994236981'
+      position:
+        x: 988.6137723840855
+        y: 536.2387658976302
+      positionAbsolute:
+        x: 988.6137723840855
+        y: 536.2387658976302
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        code: "\ndef main(arg1: str) -> dict:\n    arg1 = arg1.replace('~','-').replace('\\\
+          \\n','\\n').replace('{\"body\": \"','').replace('\"}','')\n    return {\n\
+          \        \"result\": arg1\n    }"
+        code_language: python3
+        desc: ''
+        outputs:
+          result:
+            children: null
+            type: string
+        selected: false
+        title: 代碼執行
+        type: code
+        variables:
+        - value_selector:
+          - '1726800362887'
+          - text
+          variable: arg1
+      height: 64
+      id: '1726998525575'
+      position:
+        x: 1253.4285714285716
+        y: 266
+      positionAbsolute:
+        x: 1253.4285714285716
+        y: 266
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        assigned_variable_selector:
+        - conversation
+        - meeting_room_info
+        desc: ''
+        input_variable_selector:
+        - '1726998525575'
+        - result
+        selected: false
+        title: 變數分配器
+        type: assigner
+        write_mode: over-write
+      height: 105
+      id: '1726999289105'
+      position:
+        x: 1500.054539644725
+        y: 266
+      positionAbsolute:
+        x: 1500.054539644725
+        y: 266
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        author: ITAI
+        desc: ''
+        height: 275
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"借用日期(start_date):xxxx/xx/xx","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":0},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"會議號碼(meeting_number):xxxx","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":0},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"會議名稱(meeting_subject):xxxxxx","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":0},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"借用時間(time_from):xxxxx","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":0},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"結束時間(time_to):xxxxx''","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":0}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: ''
+        type: ''
+        width: 355
+      height: 275
+      id: '1727004133976'
+      position:
+        x: 341.8525699861409
+        y: 436.0083957075574
+      positionAbsolute:
+        x: 341.8525699861409
+        y: 436.0083957075574
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 355
+    - data:
+        desc: ''
+        provider_id: 80b441aa-14b7-4f8e-93ca-4fe54aa396fa
+        provider_name: 訂會議室api
+        provider_type: workflow
+        selected: false
+        title: 訂會議室api
+        tool_configurations: {}
+        tool_label: 訂會議室api
+        tool_name: booking_meeting_room
+        tool_parameters:
+          meeting_subject:
+            type: mixed
+            value: '{{#1726994236981.meeting_subject#}}'
+          room_number:
+            type: mixed
+            value: '{{#1726994208040.room_number#}}'
+          start_date:
+            type: mixed
+            value: '{{#1726994159077.start_date#}}'
+          time_from:
+            type: mixed
+            value: '{{#1726994112587.time_from#}}'
+          time_to:
+            type: mixed
+            value: '{{#1726994039878.time_to#}}'
+        type: tool
+      height: 64
+      id: '1727004663561'
+      position:
+        x: 1608.2312902090694
+        y: 470.4980397391055
+      positionAbsolute:
+        x: 1608.2312902090694
+        y: 470.4980397391055
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - conversation
+          - meeting_room_info
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0
+            top_p: 0.9
+          mode: chat
+          name: gemma2:27b
+          provider: langgenius/ollama/ollama
+        prompt_template:
+        - id: f338c59e-cdbf-4b0d-9a6b-993a58fef225
+          role: system
+          text: '您的任務是協助訂會議室，您的名字是艾麗。
+
+
+            您要與使用者進行對話，協助他們預訂會議室。
+
+
+            若要預訂會議室，您需要下列資訊：借用日期(start_date)、會議號碼(meeting_room)、會議名稱(meeting_subject)、借用時間(time_from)、結束時間(time_to)。
+
+
+            收集完資訊後，請以下列格式提供輸出: ''我將幫您預訂會議室，請確認以下資訊：
+
+            借用日期(start_date):xxxx/xx/xx
+
+            會議室(meeting_room):xxxx
+
+            會議名稱(meeting_subject):xxxxxx
+
+            借用時間(time_from):xxxxx
+
+            結束時間(time_to):xxxxx''
+
+
+            會議室的可借用時間為9:00至18:00，其餘時間不提供借用。共有7間會議室：3303、3304、3305、3307、3309、3310、3311。請根據會議室借用狀態{{{#context#}}}，逐步推理回答問題，沒有標籤的時段代表是空閒的可以借用，不用回答無法借用的時段。'
+        - id: ab917615-c64d-421d-a6b1-08207f4f5baa
+          role: user
+          text: 列出所有會議室的可借用時段
+        selected: true
+        title: 列出會議室的可借用時段
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 109
+      id: '1727079229035'
+      position:
+        x: 1746.3589664390088
+        y: 266
+      positionAbsolute:
+        x: 1746.3589664390088
+        y: 266
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    viewport:
+      x: -628.5542836159202
+      y: -65.04714046955269
+      zoom: 0.745077106761408
