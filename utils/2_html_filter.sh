@@ -13,7 +13,7 @@ do
   cat "$file" | \
   awk '/meetingRoomRecordPk/ {exit} {print}' | \
   grep -E "會議室<|刪除會議室預約" -A 9 | \
-  sed -n '/會議室</p; /2024/,+3p' | \
+  sed -n '/會議室</p; /2025/,+3p' | \
   sed -e 's|<div class="Room">|<li>|g' -e 's|</li>||g' -e 's|</div>||g' | \
   grep -v "為達公平使用會議資源" | \
   awk '{ gsub(/^[ \t]+/, ""); print }' | \
