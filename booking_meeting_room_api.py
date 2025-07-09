@@ -23,7 +23,7 @@ def run_booking():
     username = os.getenv('BOOKING_USERNAME')
     password = os.getenv('BOOKING_PASSWORD')
     print(f"使用帳號: {username}")
-    current_date = data.get('date', '2025/07/01')
+    current_date = data.get('date', '2025/07/10')
     
     if not username or not password:
         return jsonify({'error': '環境變數中缺少帳號或密碼'}), 500
