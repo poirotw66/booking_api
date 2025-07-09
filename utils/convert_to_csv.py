@@ -1,7 +1,7 @@
 from collections import defaultdict
 import csv
 def read_file(file_path):
-    with open(file_path, 'r', encoding='utf-8') as file:
+    with open(file_path, 'r', encoding='utf-8-sig') as file:
         return file.readlines()
 
 def process_files(file_list):
@@ -22,12 +22,12 @@ def process_files(file_list):
     return meeting_data
 
 def write_output(meeting_data, output_file):
-    with open(output_file, 'w', encoding='utf-8') as f:
+    with open(output_file, 'w', encoding='utf-8-sig') as f:
         for room, details in meeting_data.items():
             f.write(room + '\n')
             f.write('\n'.join(details) + '\n')
 def write_output_csv(meeting_data, csv_filename):
-    with open(csv_filename, 'w', newline='') as csvfile:
+    with open(csv_filename, 'w', newline='', encoding='utf-8-sig') as csvfile:
         # print('meeting_data:', meeting_data)
         fieldnames = ['會議室', '會議時間', '會議名稱', '借用人']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
