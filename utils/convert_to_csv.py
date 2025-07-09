@@ -34,7 +34,7 @@ def write_output_csv(meeting_data, csv_filename):
         writer.writeheader()
         for room, meeting_info in meeting_data.items():
             for i in range(0, len(meeting_info), 3):
-                row = {'會議室': room, '會議時間': meeting_info[i], '會議名稱': meeting_info[i+1], '借用人': meeting_info[i+2]}
+                row = {'會議室': room, '會議時間': meeting_info[i], '會議名稱': meeting_info[i + 1], '借用人': meeting_info[i + 2]}
                 writer.writerow(row)
             # writer.writerow({'會議室', '時間', '會議名稱', '借用人'})
             

@@ -24,6 +24,34 @@ BUILDING_CONFIG = {
     '22': '高雄資訊開發中心'
 }
 
+# 根路徑 - API 服務狀態
+@app.route('/', methods=['GET'])
+def home():
+    """API 服務首頁和狀態檢查"""
+    return jsonify({
+        'service': 'Booking Meeting Room API',
+        'status': 'running',
+        'version': '2.0',
+        'endpoints': {
+            'GET /': 'Service status check',
+            'GET /health': 'Health check',
+            'GET /buildings': 'Get available buildings list',
+            'POST /run': 'Query meeting room availability',
+            'POST /book': 'Book meeting room'
+        },
+        'available_buildings': BUILDING_CONFIG
+    })
+
+# 健康檢查端點
+@app.route('/health', methods=['GET'])
+def health_check():
+    """健康檢查端點"""
+    return jsonify({
+        'status': 'healthy',
+        'timestamp': time.time(),
+        'service': 'booking-api'
+    })
+
 # API 路由：根據提供的登入資訊和日期，進行會議室查詢
 @app.route('/run', methods=['POST'])
 def run_booking():
