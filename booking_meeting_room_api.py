@@ -24,9 +24,6 @@ BUILDING_CONFIG = {
     '22': '高雄資訊開發中心'
 }
 
-# 預設要查詢的建築物 (可以是單個或多個)
-DEFAULT_BUILDINGS = ['20']  # A3置地廣場 和 松仁大樓
-
 # API 路由：根據提供的登入資訊和日期，進行會議室查詢
 @app.route('/run', methods=['POST'])
 def run_booking():
@@ -38,7 +35,8 @@ def run_booking():
     current_date = data.get('date', '2025/07/10')
 
     # 取得要查詢的建築物列表，如果沒有指定則使用預設值
-    buildings = data.get('buildings', DEFAULT_BUILDINGS)
+    default_buildings = data.get('default_buildings', ['20'])  # A3置地廣場
+    buildings = data.get('buildings', default_buildings)
     if isinstance(buildings, str):
         buildings = [buildings]  # 如果是單個字串，轉換為列表
 
@@ -70,7 +68,7 @@ def run_booking():
         WebDriverWait(driver, 15).until(
             EC.presence_of_element_located((By.ID, 'startDate'))
         )
-        time.sleep(2)  # 額外等待確保頁面完全載入
+        time.sleep(1)  # 額外等待確保頁面完全載入
     except Exception as e:
         print(f"登入可能失敗或頁面載入超時: {e}")
         driver.quit()
@@ -106,13 +104,13 @@ def run_booking():
         dropdown = driver.find_element(By.ID, 'searchBeanBuildingPK')
         select = Select(dropdown)
         select.select_by_value(building_id)
-        
+
         # 等待頁面載入時段選擇按鈕
         try:
             WebDriverWait(driver, 15).until(
                 EC.presence_of_element_located((By.XPATH, '//button[@name="selectedTimePeriod"]'))
             )
-            time.sleep(3)  # 確保所有按鈕都載入完成
+            time.sleep(1)  # 確保所有按鈕都載入完成
         except Exception as e:
             print(f"等待時段按鈕載入失敗 - {building_name}: {e}")
             continue  # 跳過這個建築物，繼續下一個
@@ -128,7 +126,7 @@ def run_booking():
             )
             morning_btn.click()
             driver.implicitly_wait(10)
-            time.sleep(2)  # 等待頁面更新
+            time.sleep(1)  # 等待頁面更新
             page_source = driver.page_source
             print(f"早上頁面內容長度：{len(page_source)} 字符 - {building_name}")
             print(f"頁面是否包含會議室關鍵字：{'會議室' in page_source}")
@@ -143,7 +141,7 @@ def run_booking():
                 )
                 morning_btn.click()
                 driver.implicitly_wait(10)
-                time.sleep(2)
+                time.sleep(1)
                 page_source = driver.page_source
                 building_morning_data = page_source
             except Exception as e2:
@@ -152,7 +150,7 @@ def run_booking():
 
         morning_file_name = f'./tmp/{building_id}_{current_date.replace("/", "")}_morning.html'
         if building_morning_data:
-            with open(morning_file_name, 'w', encoding='utf-8') as f:
+            with open(morning_file_name, 'w', encoding='utf-8-sig') as f:
                 f.write(building_morning_data)
 
         # 處理下午時段
@@ -162,7 +160,7 @@ def run_booking():
             )
             afternoon_btn.click()
             driver.implicitly_wait(10)
-            time.sleep(2)  # 等待頁面更新
+            time.sleep(1)  # 等待頁面更新
             page_source = driver.page_source
             print(f"下午頁面內容長度：{len(page_source)} 字符 - {building_name}")
             print(f"頁面是否包含會議室關鍵字：{'會議室' in page_source}")
@@ -177,7 +175,7 @@ def run_booking():
                 )
                 afternoon_btn.click()
                 driver.implicitly_wait(10)
-                time.sleep(2)
+                time.sleep(1)
                 page_source = driver.page_source
                 building_afternoon_data = page_source
             except Exception as e2:
@@ -186,7 +184,7 @@ def run_booking():
 
         afternoon_file_name = f'./tmp/{building_id}_{current_date.replace("/", "")}_afternoon.html'
         if building_afternoon_data:
-            with open(afternoon_file_name, 'w', encoding='utf-8') as f:
+            with open(afternoon_file_name, 'w', encoding='utf-8-sig') as f:
                 f.write(building_afternoon_data)
 
         # 儲存這個建築物的檔案資訊
@@ -255,7 +253,7 @@ def run_booking():
         if os.path.exists(file_path):
             print(f"處理後檔案存在：{file_path}, 大小：{os.path.getsize(file_path)} bytes")
             # 顯示檔案前幾行內容
-            with open(file_path, 'r', encoding='utf-8') as f:
+            with open(file_path, 'r', encoding='utf-8-sig') as f:
                 lines = f.readlines()[:10]
                 print(f"{file_path} 前10行內容：")
                 for i, line in enumerate(lines, 1):
@@ -268,7 +266,7 @@ def run_booking():
 
     write_output(meeting_data, output_file)
     write_output_csv(meeting_data, output_csv)
-    with open(output_csv, 'r', encoding='utf-8') as csv_file:
+    with open(output_csv, 'r', encoding='utf-8-sig') as csv_file:
         csv_content = csv_file.read()
 
     # 暫時不刪除檔案，方便調試
@@ -330,7 +328,7 @@ def book_meeting_room():
     email = driver.find_element(By.NAME, 'username')
     email.send_keys(username)
     password_field = driver.find_element(By.ID, 'KEY')
-    password_field.send_keys(password)  
+    password_field.send_keys(password)
 
     # 點擊登入按鈕
     login_button = driver.find_element(By.ID, 'btnLogin')
@@ -425,9 +423,10 @@ def book_meeting_room():
 @app.route('/buildings', methods=['GET'])
 def get_buildings():
     """返回所有可用的建築物列表"""
+    default_buildings = ['6']  # A3置地廣場
     return jsonify({
         'buildings': BUILDING_CONFIG,
-        'default_buildings': DEFAULT_BUILDINGS,
+        'default_buildings': default_buildings,
         'message': '可用的建築物列表'
     })
 
