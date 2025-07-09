@@ -68,7 +68,7 @@
 ```bash
 curl -X POST http://localhost:5000/run \
   -H "Content-Type: application/json" \
-  -d '{"date": "2024/09/20"}'
+  -d '{"date": "2025/07/09"}'
 ```
 
 ### 預約會議室
