@@ -1,16 +1,26 @@
-from flask import Flask, request, jsonify, Response
 from selenium import webdriver
-import time
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import Select
-import subprocess
-from utils.convert_to_csv import process_files, write_output, write_output_csv
 import os
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from dotenv import load_dotenv
+
+load_dotenv()
+
+username = os.getenv('BOOKING_USERNAME')
+password = os.getenv('BOOKING_PASSWORD')
 
 options = webdriver.ChromeOptions()
 options.add_experimental_option("detach", True)
 driver = webdriver.Chrome(options=options)
-driver.get('https://booking.cathayholdings.com/frontend/mrm101w/index?')
-time.sleep(60)
+driver.get('https://booking.cathayholdings.com/frontend/mrm101w/index?')\
+
+driver.implicitly_wait(5)  # 減少隱式等待時間
+email = WebDriverWait(driver, 10).until(
+    EC.presence_of_element_located((By.NAME, 'username'))
+)
+email.send_keys(username)
+password_field = driver.find_element(By.ID, 'KEY')
+password_field.send_keys(password)
+login_button = driver.find_element(By.ID, 'btnLogin')
+login_button.click()

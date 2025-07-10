@@ -79,12 +79,9 @@ def run_booking():
     driver = webdriver.Chrome(options=options)
     driver.get('https://booking.cathayholdings.com/frontend/mrm101w/index?')
     # 登入
-    driver.implicitly_wait(5)  # 減少隱式等待時間
-    
-    # 使用顯式等待確保登入元素載入
-    email = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.NAME, 'username'))
-    )
+    # time.sleep(2)
+    driver.implicitly_wait(10)
+    email = driver.find_element(By.NAME, 'username')
     email.send_keys(username)
     password_field = driver.find_element(By.ID, 'KEY')
     password_field.send_keys(password)
@@ -138,7 +135,7 @@ def run_booking():
 
         # 等待頁面載入時段選擇按鈕
         try:
-            WebDriverWait(driver, 5).until(
+            WebDriverWait(driver, 15).until(
                 EC.presence_of_element_located((By.XPATH, '//button[@name="selectedTimePeriod"]'))
             )
             time.sleep(1)  # 確保所有按鈕都載入完成
@@ -152,11 +149,12 @@ def run_booking():
 
         try:
             # 使用 WebDriverWait 明確等待元素出現
-            morning_btn = WebDriverWait(driver, 5).until(
+            morning_btn = WebDriverWait(driver, 20).until(
                 EC.element_to_be_clickable((By.XPATH, '//button[@name="selectedTimePeriod" and @value="MORNING"]'))
             )
             morning_btn.click()
-            time.sleep(0.5)  # 減少等待時間
+            driver.implicitly_wait(10)
+            time.sleep(1)  # 等待頁面更新
             page_source = driver.page_source
             print(f"早上頁面內容長度：{len(page_source)} 字符 - {building_name}")
             print(f"頁面是否包含會議室關鍵字：{'會議室' in page_source}")
@@ -166,11 +164,12 @@ def run_booking():
             print(f"找不到早上時段按鈕 - {building_name}: {e}")
             # 嘗試其他可能的選擇器
             try:
-                morning_btn = WebDriverWait(driver, 8).until(
+                morning_btn = WebDriverWait(driver, 10).until(
                     EC.element_to_be_clickable((By.XPATH, '//button[contains(@value, "MORNING")]'))
                 )
                 morning_btn.click()
-                time.sleep(0.5)
+                driver.implicitly_wait(10)
+                time.sleep(1)
                 page_source = driver.page_source
                 building_morning_data = page_source
             except Exception as e2:
@@ -184,11 +183,12 @@ def run_booking():
 
         # 處理下午時段
         try:
-            afternoon_btn = WebDriverWait(driver, 5).until(
+            afternoon_btn = WebDriverWait(driver, 20).until(
                 EC.element_to_be_clickable((By.XPATH, '//button[@name="selectedTimePeriod" and @value="AFTERNOON"]'))
             )
             afternoon_btn.click()
-            time.sleep(0.5)  # 減少等待時間
+            driver.implicitly_wait(10)
+            time.sleep(1)  # 等待頁面更新
             page_source = driver.page_source
             print(f"下午頁面內容長度：{len(page_source)} 字符 - {building_name}")
             print(f"頁面是否包含會議室關鍵字：{'會議室' in page_source}")
@@ -198,11 +198,12 @@ def run_booking():
             print(f"找不到下午時段按鈕 - {building_name}: {e}")
             # 嘗試其他可能的選擇器
             try:
-                afternoon_btn = WebDriverWait(driver, 8).until(
+                afternoon_btn = WebDriverWait(driver, 10).until(
                     EC.element_to_be_clickable((By.XPATH, '//button[contains(@value, "AFTERNOON")]'))
                 )
                 afternoon_btn.click()
-                time.sleep(0.5)
+                driver.implicitly_wait(10)
+                time.sleep(1)
                 page_source = driver.page_source
                 building_afternoon_data = page_source
             except Exception as e2:
@@ -314,44 +315,6 @@ meeting_room_xpath = {
     '3309': '//*[@id="timeTableMeetingRoom"]/div[10]/button[1]',
     '3310': '//*[@id="timeTableMeetingRoom"]/div[12]/button[1]',
     '3311': '//*[@id="timeTableMeetingRoom"]/div[14]/button[1]'
-}
-
-songren_room_xpath = {
-    '15F-15樓接待大廳': '//*[@id="timeTableMeetingRoom"]/div[10]/button[1]',
-    '15F-階梯教室': '//*[@id="timeTableMeetingRoom"]/div[12]/button[1]',
-    '15F-深水炸彈-1(15-1)': '//*[@id="timeTableMeetingRoom"]/div[14]/button[1]',
-    '15F-深水炸彈-2(15-2)': '//*[@id="timeTableMeetingRoom"]/div[16]/button[1]',
-    '15F-老經典(15-3)': '//*[@id="timeTableMeetingRoom"]/div[18]/button[1]',
-    '15F-香格里拉(15-4)(觀察室)': '//*[@id="timeTableMeetingRoom"]/div[20]/button[1]',
-    '15F-血腥瑪麗(15-5)(受訪室)': '//*[@id="timeTableMeetingRoom"]/div[22]/button[1]',
-    '15F-亞歷山大(15-10)': '//*[@id="timeTableMeetingRoom"]/div[24]/button[1]',
-    '15F-琴通寧(15-11)': '//*[@id="timeTableMeetingRoom"]/div[26]/button[1]',
-    '4F-安新芽': '//*[@id="timeTableMeetingRoom"]/div[48]/button[1]',
-    '4F-微風Chill室': '//*[@id="timeTableMeetingRoom"]/div[50]/button[1]',
-    '4F-滴大地': '//*[@id="timeTableMeetingRoom"]/div[52]/button[1]',
-    '4F-光影綠谷': '//*[@id="timeTableMeetingRoom"]/div[54]/button[1]',
-    '4F-剛果秘境': '//*[@id="timeTableMeetingRoom"]/div[56]/button[1]',
-    '4F-未來綠洲': '//*[@id="timeTableMeetingRoom"]/div[58]/button[1]',
-    '4F-森林之光': '//*[@id="timeTableMeetingRoom"]/div[60]/button[1]',
-    '4F-優勝美地': '//*[@id="timeTableMeetingRoom"]/div[62]/button[1]',
-    '4F-亞馬遜雨林': '//*[@id="timeTableMeetingRoom"]/div[64]/button[1]',
-    '3F-HIVE': '//*[@id="timeTableMeetingRoom"]/div[66]/button[1]',
-    '3F-Kafka': '//*[@id="timeTableMeetingRoom"]/div[68]/button[1]',
-    '3F-中心樹投影3': '//*[@id="timeTableMeetingRoom"]/div[70]/button[1]',
-    '3F-中心樹投影5': '//*[@id="timeTableMeetingRoom"]/div[72]/button[1]',
-    '3F-Scala': '//*[@id="timeTableMeetingRoom"]/div[74]/button[1]',
-    '3F-中心樹投影6': '//*[@id="timeTableMeetingRoom"]/div[76]/button[1]',
-    '3F-Matlab': '//*[@id="timeTableMeetingRoom"]/div[78]/button[1]',
-    '3F-中心樹投影4': '//*[@id="timeTableMeetingRoom"]/div[80]/button[1]',
-    '3F-Python': '//*[@id="timeTableMeetingRoom"]/div[82]/button[1]',
-    '3F-Julia': '//*[@id="timeTableMeetingRoom"]/div[84]/button[1]',
-    '3F-中心樹投影1': '//*[@id="timeTableMeetingRoom"]/div[86]/button[1]',
-    '3F-R': '//*[@id="timeTableMeetingRoom"]/div[88]/button[1]',
-    '3F-Spark': '//*[@id="timeTableMeetingRoom"]/div[90]/button[1]',
-    '3F-SQL': '//*[@id="timeTableMeetingRoom"]/div[92]/button[1]',
-    '3F-Base': '//*[@id="timeTableMeetingRoom"]/div[94]/button[1]',
-    '3F-Java': '//*[@id="timeTableMeetingRoom"]/div[96]/button[1]',
-    '3F-C++': '//*[@id="timeTableMeetingRoom"]/div[98]/button[1]'
 }
 
 @app.route('/book', methods=['POST'])
