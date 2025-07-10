@@ -20,6 +20,9 @@ BUILDING_CONFIG = {
     '4': '仁愛大樓',
     '6': '松仁大樓',
     '10': '國泰證券總公司',
+    '12': '瑞湖大樓',
+    '15': '信義安和大樓',
+    '19': '台中忠明大樓',
     '20': 'A3置地廣場',
     '22': '高雄資訊開發中心'
 }
@@ -55,6 +58,10 @@ def health_check():
 # API 路由：根據提供的登入資訊和日期，進行會議室查詢
 @app.route('/run', methods=['POST'])
 def run_booking():
+    # 開始計時
+    start_time = time.time()
+    print(f"🕐 開始執行會議室查詢 - {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(start_time))}")
+    
     data = request.json
 
     username = os.getenv('BOOKING_USERNAME')
@@ -74,6 +81,9 @@ def run_booking():
         return jsonify({'error': '環境變數中缺少帳號或密碼'}), 500
     
     # Selenium 驅動程式設置
+    selenium_start_time = time.time()
+    print(f"🚀 啟動瀏覽器 - {time.strftime('%H:%M:%S', time.localtime(selenium_start_time))}")
+    
     options = webdriver.ChromeOptions()
     options.add_experimental_option("detach", True)
     driver = webdriver.Chrome(options=options)
@@ -93,6 +103,9 @@ def run_booking():
     login_button = driver.find_element(By.ID, 'btnLogin')
     login_button.click()
     
+    login_start_time = time.time()
+    print(f"🔐 執行登入 - {time.strftime('%H:%M:%S', time.localtime(login_start_time))}")
+    
     # 等待登入完成並檢查是否成功
     try:
         # 等待頁面元素出現，確認登入成功
@@ -100,6 +113,8 @@ def run_booking():
             EC.presence_of_element_located((By.ID, 'startDate'))
         )
         time.sleep(1)  # 額外等待確保頁面完全載入
+        login_end_time = time.time()
+        print(f"✅ 登入成功 - 耗時 {login_end_time - login_start_time:.2f} 秒")
     except Exception as e:
         print(f"登入可能失敗或頁面載入超時: {e}")
         driver.quit()
@@ -128,35 +143,33 @@ def run_booking():
 
     # 遍歷每個建築物進行查詢
     for building_id in buildings:
+        building_start_time = time.time()
         building_name = BUILDING_CONFIG.get(building_id, f'未知建築物({building_id})')
-        print(f"正在查詢建築物: {building_name} (ID: {building_id})")
+        print(f"🏢 正在查詢建築物: {building_name} (ID: {building_id}) - {time.strftime('%H:%M:%S', time.localtime(building_start_time))}")
 
         # 選擇建築物
         dropdown = driver.find_element(By.ID, 'searchBeanBuildingPK')
         select = Select(dropdown)
         select.select_by_value(building_id)
 
-        # 等待頁面載入時段選擇按鈕
+        # 等待頁面載入時段選擇按鈕並直接點擊早上按鈕
         try:
-            WebDriverWait(driver, 5).until(
-                EC.presence_of_element_located((By.XPATH, '//button[@name="selectedTimePeriod"]'))
-            )
-            time.sleep(1)  # 確保所有按鈕都載入完成
-        except Exception as e:
-            print(f"等待時段按鈕載入失敗 - {building_name}: {e}")
-            continue  # 跳過這個建築物，繼續下一個
-
-        # 下載早上與下午的數據
-        building_morning_data = None
-        building_afternoon_data = None
-
-        try:
-            # 使用 WebDriverWait 明確等待元素出現
-            morning_btn = WebDriverWait(driver, 5).until(
-                EC.element_to_be_clickable((By.XPATH, '//button[@name="selectedTimePeriod" and @value="MORNING"]'))
-            )
-            morning_btn.click()
-            time.sleep(0.5)  # 減少等待時間
+            print(f"⏳ 等待並點擊早上時段按鈕 - {building_name}")
+            # morning_btn = WebDriverWait(driver, 5).until(
+            #     EC.element_to_be_clickable((By.XPATH, '//button[@name="selectedTimePeriod" and @value="MORNING"]'))
+            # )
+            # morning_btn = WebDriverWait(driver, 5).until(
+            #     EC.element_to_be_clickable((By.XPATH, '//button[contains(@value, "MORNING")]'))
+            # )
+            # morning_btn.click()
+            driver.execute_script("""
+                let btn = document.querySelector('button[name="selectedTimePeriod"][value="MORNING"]');
+                btn.click();
+            """)
+            print(f"✅ 早上按鈕點擊成功 - {building_name}")
+            
+            # 等待頁面載入會議室數據
+            time.sleep(0.5)
             page_source = driver.page_source
             print(f"早上頁面內容長度：{len(page_source)} 字符 - {building_name}")
             print(f"頁面是否包含會議室關鍵字：{'會議室' in page_source}")
@@ -166,13 +179,15 @@ def run_booking():
             print(f"找不到早上時段按鈕 - {building_name}: {e}")
             # 嘗試其他可能的選擇器
             try:
-                morning_btn = WebDriverWait(driver, 8).until(
+                print(f"🔄 嘗試備用選擇器 - {building_name}")
+                morning_btn = WebDriverWait(driver, 5).until(
                     EC.element_to_be_clickable((By.XPATH, '//button[contains(@value, "MORNING")]'))
                 )
                 morning_btn.click()
                 time.sleep(0.5)
                 page_source = driver.page_source
                 building_morning_data = page_source
+                print(f"✅ 備用選擇器成功 - {building_name}")
             except Exception as e2:
                 print(f"使用備用選擇器也失敗 - {building_name}: {e2}")
                 continue  # 跳過這個建築物，繼續下一個
@@ -181,14 +196,20 @@ def run_booking():
         if building_morning_data:
             with open(morning_file_name, 'w', encoding='utf-8-sig') as f:
                 f.write(building_morning_data)
-
-        # 處理下午時段
+        # 處理下午時段 - 同樣優化
         try:
-            afternoon_btn = WebDriverWait(driver, 5).until(
-                EC.element_to_be_clickable((By.XPATH, '//button[@name="selectedTimePeriod" and @value="AFTERNOON"]'))
-            )
-            afternoon_btn.click()
-            time.sleep(0.5)  # 減少等待時間
+            print(f"⏳ 等待並點擊下午時段按鈕 - {building_name}")
+            # afternoon_btn = WebDriverWait(driver, 5).until(
+            #     EC.element_to_be_clickable((By.XPATH, '//button[@name="selectedTimePeriod" and @value="AFTERNOON"]'))
+            # )
+            # afternoon_btn.click()
+            driver.execute_script("""
+                let btn = document.querySelector('button[name="selectedTimePeriod"][value="AFTERNOON"]');
+                btn.click();
+            """)
+            print(f"✅ 下午按鈕點擊成功 - {building_name}")
+            
+            time.sleep(0.5)
             page_source = driver.page_source
             print(f"下午頁面內容長度：{len(page_source)} 字符 - {building_name}")
             print(f"頁面是否包含會議室關鍵字：{'會議室' in page_source}")
@@ -198,13 +219,15 @@ def run_booking():
             print(f"找不到下午時段按鈕 - {building_name}: {e}")
             # 嘗試其他可能的選擇器
             try:
-                afternoon_btn = WebDriverWait(driver, 8).until(
+                print(f"🔄 嘗試備用選擇器 - {building_name}")
+                afternoon_btn = WebDriverWait(driver, 5).until(
                     EC.element_to_be_clickable((By.XPATH, '//button[contains(@value, "AFTERNOON")]'))
                 )
                 afternoon_btn.click()
                 time.sleep(0.5)
                 page_source = driver.page_source
                 building_afternoon_data = page_source
+                print(f"✅ 備用選擇器成功 - {building_name}")
             except Exception as e2:
                 print(f"使用備用選擇器也失敗 - {building_name}: {e2}")
                 continue  # 跳過這個建築物，繼續下一個
@@ -216,25 +239,33 @@ def run_booking():
 
         # 儲存這個建築物的檔案資訊
         if building_morning_data and building_afternoon_data:
+            building_end_time = time.time()
             all_building_data.append({
                 'building_id': building_id,
                 'building_name': building_name,
                 'morning_file': morning_file_name,
                 'afternoon_file': afternoon_file_name
             })
-            print(f"成功收集建築物 {building_name} 的數據")
+            print(f"✅ 成功收集建築物 {building_name} 的數據 - 耗時 {building_end_time - building_start_time:.2f} 秒")
         else:
-            print(f"建築物 {building_name} 數據收集不完整，跳過")
+            building_end_time = time.time()
+            print(f"❌ 建築物 {building_name} 數據收集不完整，跳過 - 耗時 {building_end_time - building_start_time:.2f} 秒")
 
     driver.quit()
+    
+    crawling_end_time = time.time()
+    print(f"🕷️ 爬蟲階段完成 - 總耗時 {crawling_end_time - selenium_start_time:.2f} 秒")
 
     # 檢查是否有成功收集到數據
     if not all_building_data:
         return jsonify({'error': '沒有成功收集到任何建築物的數據'}), 500
 
-    print(f"成功收集到 {len(all_building_data)} 個建築物的數據")
+    print(f"📊 成功收集到 {len(all_building_data)} 個建築物的數據")
 
     # 處理所有建築物的檔案
+    processing_start_time = time.time()
+    print(f"⚙️ 開始處理檔案 - {time.strftime('%H:%M:%S', time.localtime(processing_start_time))}")
+    
     all_file_list = []
     for building_data in all_building_data:
         morning_file = building_data['morning_file']
@@ -254,7 +285,10 @@ def run_booking():
         print(f"下午檔案大小：{os.path.getsize(afternoon_file)} bytes")
 
         # 執行Shell腳本進行文件處理
-        result = subprocess.run(['sh', 'utils/2_html_filter.sh', morning_file, afternoon_file], capture_output=True, text=True)
+        if current_date[:4] == "2024":
+            result = subprocess.run(['sh', 'utils/2_html_filter_2024.sh', morning_file, afternoon_file], capture_output=True, text=True)
+        else:
+            result = subprocess.run(['sh', 'utils/2_html_filter_2025.sh', morning_file, afternoon_file], capture_output=True, text=True)
         print(f"Shell腳本執行結果 - {building_name}：")
         print("stdout:", result.stdout)
         print("stderr:", result.stderr)
@@ -293,6 +327,16 @@ def run_booking():
 
     write_output(meeting_data, output_file)
     write_output_csv(meeting_data, output_csv)
+    
+    # 計算總執行時間
+    end_time = time.time()
+    total_time = end_time - start_time
+    processing_time = end_time - processing_start_time
+    
+    print(f"📝 檔案處理完成 - 耗時 {processing_time:.2f} 秒")
+    print(f"🏁 總執行時間: {total_time:.2f} 秒")
+    print(f"📈 平均每個建築物耗時: {total_time / len(all_building_data):.2f} 秒")
+    
     with open(output_csv, 'r', encoding='utf-8-sig') as csv_file:
         csv_content = csv_file.read()
 
