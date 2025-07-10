@@ -46,7 +46,7 @@ python booking_meeting_room_api.py
 
 成功的話就執行,爬取2024年的瑞湖大樓會議室資料
 ```
-./query_ruihu_build_2024.sh
+./batch_query_ruihu_2024.sh
 ```
 
 ## 🏢 支援的建築物
