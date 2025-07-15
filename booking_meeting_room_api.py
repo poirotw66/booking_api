@@ -70,7 +70,7 @@ def run_booking():
     current_date = data.get('date', '2025/07/10')
 
     # 取得要查詢的建築物列表，如果沒有指定則使用預設值
-    default_buildings = data.get('default_buildings', ['20'])  # A3置地廣場
+    default_buildings = data.get('default_buildings', ['6'])  # A3置地廣場
     buildings = data.get('buildings', default_buildings)
     if isinstance(buildings, str):
         buildings = [buildings]  # 如果是單個字串，轉換為列表
@@ -411,7 +411,7 @@ def book_meeting_room():
     time_to_value = data.get('time_to', '09:00')
 
     # 取得要預訂的建築物，如果沒有指定則使用預設值 (A3置地廣場)
-    building_id = data.get('building_id', '20')
+    building_id = data.get('building_id', '6')
     building_name = BUILDING_CONFIG.get(building_id, f'未知建築物({building_id})')
     print(f"要預訂的建築物: {building_name} (ID: {building_id})")
 
@@ -480,7 +480,8 @@ def book_meeting_room():
     driver.implicitly_wait(10)
 
     # 點擊對應房間的按鈕
-    xpath_value = meeting_room_xpath.get(room_number)
+    # xpath_value = meeting_room_xpath.get(room_number)
+    xpath_value = songren_room_xpath.get(room_number)
     book_btn = driver.find_element(By.XPATH, xpath_value)
     book_btn.click()
 

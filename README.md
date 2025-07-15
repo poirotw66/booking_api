@@ -77,7 +77,7 @@ curl -X POST http://localhost:5000/book \
   -H "Content-Type: application/json" \
   -d '{
     "room_number": "3303",
-    "start_date": "2024/09/19",
+    "start_date": "2025/07/16",
     "meeting_subject": "Technical Discussion",
     "time_from": "08:00",
     "time_to": "09:00"
