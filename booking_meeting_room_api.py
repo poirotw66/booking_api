@@ -3,8 +3,8 @@ from selenium import webdriver
 import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
-import subprocess
 from utils.convert_to_csv import process_files, write_output, write_output_csv
+from utils.extract_meeting_info import process_html_file
 import os
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -284,19 +284,26 @@ def run_booking():
         print(f"早上檔案大小：{os.path.getsize(morning_file)} bytes")
         print(f"下午檔案大小：{os.path.getsize(afternoon_file)} bytes")
 
-        # 執行Shell腳本進行文件處理
-        if current_date[:4] == "2024":
-            result = subprocess.run(['sh', 'utils/2_html_filter_2024.sh', morning_file, afternoon_file], capture_output=True, text=True)
-        else:
-            result = subprocess.run(['sh', 'utils/2_html_filter_2025.sh', morning_file, afternoon_file], capture_output=True, text=True)
-        print(f"Shell腳本執行結果 - {building_name}：")
-        print("stdout:", result.stdout)
-        print("stderr:", result.stderr)
-        print("return code:", result.returncode)
+        # 使用Python模組進行文件處理
+        try:
+            # 處理早上的HTML檔案
+            processed_morning = morning_file[:-5]  # 移除 .html 擴展名
+            morning_meetings = process_html_file(morning_file, processed_morning)
+            print(f"早上檔案處理完成 - {building_name}：提取 {len(morning_meetings)} 筆記錄")
+            
+            # 處理下午的HTML檔案
+            processed_afternoon = afternoon_file[:-5]  # 移除 .html 擴展名
+            afternoon_meetings = process_html_file(afternoon_file, processed_afternoon)
+            print(f"下午檔案處理完成 - {building_name}：提取 {len(afternoon_meetings)} 筆記錄")
+            
+            print(f"Python模組執行結果 - {building_name}：")
+            print(f"總計提取 {len(morning_meetings) + len(afternoon_meetings)} 筆會議室預訂記錄")
+            
+        except Exception as e:
+            print(f"處理 {building_name} 檔案時發生錯誤：{e}")
+            continue
 
         # 添加處理後的檔案到列表
-        processed_morning = morning_file[:-5]  # 移除 .html 擴展名
-        processed_afternoon = afternoon_file[:-5]
         all_file_list.extend([processed_morning, processed_afternoon])
 
     if not all_file_list:
