@@ -195,40 +195,173 @@ def run_booking():
             print(f"選擇建築物失敗 - {building_name}: {e}")
             continue
 
-        # 激進優化：快速連續切換時段並收集數據
+        # 智能優化：先判斷當前時段再收集數據
         building_morning_data = None
         building_afternoon_data = None
         
         try:
-            print(f"⚡ 快速收集 {building_name} 上下午數據...")
+            print(f"⚡ 智能收集 {building_name} 上下午數據...")
             
-            # 快速切換到早上並獲取數據
-            driver.execute_script("""
+            # 檢測當前頁面是上午還是下午時段 - 改進檢測邏輯
+            current_period = driver.execute_script("""
                 let morningBtn = document.querySelector('button[name="selectedTimePeriod"][value="MORNING"]');
-                if (morningBtn) morningBtn.click();
-            """)
-            
-            # 最小等待時間，只等待DOM更新
-            time.sleep(0.3)
-            building_morning_data = driver.page_source
-            
-            # 立即切換到下午並獲取數據
-            driver.execute_script("""
                 let afternoonBtn = document.querySelector('button[name="selectedTimePeriod"][value="AFTERNOON"]');
-                if (afternoonBtn) afternoonBtn.click();
+                
+                // 方法1: 檢查按鈕的 class 屬性
+                if (morningBtn && (morningBtn.classList.contains('active') || morningBtn.classList.contains('selected') || morningBtn.classList.contains('btn-primary'))) {
+                    return 'MORNING';
+                }
+                if (afternoonBtn && (afternoonBtn.classList.contains('active') || afternoonBtn.classList.contains('selected') || afternoonBtn.classList.contains('btn-primary'))) {
+                    return 'AFTERNOON';
+                }
+                
+                // 方法2: 檢查按鈕的 style 屬性
+                if (morningBtn && morningBtn.style.backgroundColor && morningBtn.style.backgroundColor !== 'transparent') {
+                    return 'MORNING';
+                }
+                if (afternoonBtn && afternoonBtn.style.backgroundColor && afternoonBtn.style.backgroundColor !== 'transparent') {
+                    return 'AFTERNOON';
+                }
+                
+                // 方法3: 檢查 aria-pressed 或 data-* 屬性
+                if (morningBtn && (morningBtn.getAttribute('aria-pressed') === 'true' || morningBtn.dataset.selected === 'true')) {
+                    return 'MORNING';
+                }
+                if (afternoonBtn && (afternoonBtn.getAttribute('aria-pressed') === 'true' || afternoonBtn.dataset.selected === 'true')) {
+                    return 'AFTERNOON';
+                }
+                
+                // 方法4: 檢查按鈕的 disabled 狀態（未選中的可能是 disabled）
+                if (morningBtn && !morningBtn.disabled && afternoonBtn && afternoonBtn.disabled) {
+                    return 'MORNING';
+                }
+                if (afternoonBtn && !afternoonBtn.disabled && morningBtn && morningBtn.disabled) {
+                    return 'AFTERNOON';
+                }
+                
+                // 方法5: 檢查頁面內容中的時間表格或數據
+                let timeElements = document.querySelectorAll('.time, .hour, [class*="time"]');
+                let foundAfternoon = false;
+                let foundMorning = false;
+                
+                for (let element of timeElements) {
+                    let text = element.textContent || element.innerText;
+                    if (text.includes('13:') || text.includes('14:') || text.includes('15:') || text.includes('16:') || text.includes('17:')) {
+                        foundAfternoon = true;
+                    }
+                    if (text.includes('08:') || text.includes('09:') || text.includes('10:') || text.includes('11:') || text.includes('12:')) {
+                        foundMorning = true;
+                    }
+                }
+                
+                if (foundAfternoon && !foundMorning) return 'AFTERNOON';
+                if (foundMorning && !foundAfternoon) return 'MORNING';
+                
+                // 方法6: 檢查頁面 URL 或表單隱藏字段
+                let hiddenInputs = document.querySelectorAll('input[type="hidden"]');
+                for (let input of hiddenInputs) {
+                    if (input.name.includes('period') || input.name.includes('time')) {
+                        if (input.value === 'AFTERNOON' || input.value === 'PM') return 'AFTERNOON';
+                        if (input.value === 'MORNING' || input.value === 'AM') return 'MORNING';
+                    }
+                }
+                
+                // 如果所有方法都無法確定，記錄詳細信息並預設為上午
+                console.log('無法確定當前時段，按鈕狀態:');
+                console.log('Morning button classes:', morningBtn ? morningBtn.className : 'not found');
+                console.log('Afternoon button classes:', afternoonBtn ? afternoonBtn.className : 'not found');
+                console.log('Morning button style:', morningBtn ? morningBtn.style.cssText : 'not found');
+                console.log('Afternoon button style:', afternoonBtn ? afternoonBtn.style.cssText : 'not found');
+                
+                return 'MORNING';  // 預設為上午
             """)
             
-            # 最小等待時間
-            time.sleep(0.3)
-            building_afternoon_data = driver.page_source
+            print(f"🔍 {building_name} 當前時段: {current_period}")
+            
+            if current_period == 'MORNING':
+                # 當前是上午，先截取上午數據
+                print(f"📅 {building_name} 截取上午數據...")
+                time.sleep(0.2)  # 確保頁面穩定
+                building_morning_data = driver.page_source
+                
+                # 驗證數據是否確實是上午時段
+                morning_verification = driver.execute_script("""
+                    let content = document.body.innerHTML;
+                    let afternoonTimes = (content.match(/1[3-7]:/g) || []).length;
+                    let morningTimes = (content.match(/0[8-9]:|1[0-2]:/g) || []).length;
+                    return {afternoon: afternoonTimes, morning: morningTimes};
+                """)
+                
+                if morning_verification['afternoon'] > morning_verification['morning']:
+                    print(f"⚠️ {building_name} 檢測到時段不匹配！重新檢測...")
+                    current_period = 'AFTERNOON'
+                    building_afternoon_data = building_morning_data
+                    building_morning_data = None
+                
+                if building_morning_data:
+                    # 切換到下午
+                    print(f"🔄 {building_name} 切換到下午...")
+                    driver.execute_script("""
+                        let afternoonBtn = document.querySelector('button[name="selectedTimePeriod"][value="AFTERNOON"]');
+                        if (afternoonBtn) afternoonBtn.click();
+                    """)
+                    time.sleep(0.3)
+                    building_afternoon_data = driver.page_source
+                else:
+                    # 切換到上午獲取正確數據
+                    print(f"🔄 {building_name} 切換到上午...")
+                    driver.execute_script("""
+                        let morningBtn = document.querySelector('button[name="selectedTimePeriod"][value="MORNING"]');
+                        if (morningBtn) morningBtn.click();
+                    """)
+                    time.sleep(0.3)
+                    building_morning_data = driver.page_source
+                
+            else:  # AFTERNOON
+                # 當前是下午，先截取下午數據
+                print(f"🌆 {building_name} 截取下午數據...")
+                time.sleep(0.2)  # 確保頁面穩定
+                building_afternoon_data = driver.page_source
+                
+                # 驗證數據是否確實是下午時段
+                afternoon_verification = driver.execute_script("""
+                    let content = document.body.innerHTML;
+                    let afternoonTimes = (content.match(/1[3-7]:/g) || []).length;
+                    let morningTimes = (content.match(/0[8-9]:|1[0-2]:/g) || []).length;
+                    return {afternoon: afternoonTimes, morning: morningTimes};
+                """)
+                
+                if afternoon_verification['morning'] > afternoon_verification['afternoon']:
+                    print(f"⚠️ {building_name} 檢測到時段不匹配！重新檢測...")
+                    current_period = 'MORNING'
+                    building_morning_data = building_afternoon_data
+                    building_afternoon_data = None
+                
+                if building_afternoon_data:
+                    # 切換到上午
+                    print(f"🔄 {building_name} 切換到上午...")
+                    driver.execute_script("""
+                        let morningBtn = document.querySelector('button[name="selectedTimePeriod"][value="MORNING"]');
+                        if (morningBtn) morningBtn.click();
+                    """)
+                    time.sleep(0.3)
+                    building_morning_data = driver.page_source
+                else:
+                    # 切換到下午獲取正確數據
+                    print(f"🔄 {building_name} 切換到下午...")
+                    driver.execute_script("""
+                        let afternoonBtn = document.querySelector('button[name="selectedTimePeriod"][value="AFTERNOON"]');
+                        if (afternoonBtn) afternoonBtn.click();
+                    """)
+                    time.sleep(0.3)
+                    building_afternoon_data = driver.page_source
             
             # 快速驗證數據完整性
-            if (building_morning_data and len(building_morning_data) > 30000
-                    and building_afternoon_data and len(building_afternoon_data) > 30000):
-                print(f"✅ {building_name} 快速數據收集成功")
+            if (building_morning_data and len(building_morning_data) > 30000 and building_afternoon_data and len(building_afternoon_data) > 30000):
+                print(f"✅ {building_name} 智能數據收集成功")
             else:
                 print(f"⚠️ {building_name} 數據可能不完整，使用備用方法...")
-                # 備用方法：稍微增加等待時間
+                # 備用方法：強制按順序收集
                 driver.execute_script("""
                     let morningBtn = document.querySelector('button[name="selectedTimePeriod"][value="MORNING"]');
                     if (morningBtn) morningBtn.click();
@@ -252,7 +385,7 @@ def run_booking():
         # 處理保存數據並添加性能監測
         if building_morning_data and building_afternoon_data:
             period_switch_time = time.time() - building_start_time
-            print(f"⚡ {building_name} 時段切換總耗時: {period_switch_time:.2f}秒 (激進優化)")
+            print(f"⚡ {building_name} 時段切換總耗時: {period_switch_time:.2f}秒 (智能優化)")
             
             morning_file_name = f'./tmp/{building_id}_{current_date.replace("/", "")}_morning.html'
             afternoon_file_name = f'./tmp/{building_id}_{current_date.replace("/", "")}_afternoon.html'
