@@ -89,7 +89,9 @@ def run_booking():
     options = webdriver.ChromeOptions()
     options.add_experimental_option("detach", True)
     # Chrome 瀏覽器路徑 (macOS)
-    options.binary_location = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+    # options.binary_location = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+    # ubuntu
+    options.binary_location = "/usr/bin/google-chrome"
     # 效能優化選項
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
@@ -540,15 +542,15 @@ songren_room_xpath = {
     '15F-血腥瑪麗(15-5)(受訪室)': '//*[@id="timeTableMeetingRoom"]/div[22]/button[1]',
     '15F-亞歷山大(15-10)': '//*[@id="timeTableMeetingRoom"]/div[24]/button[1]',
     '15F-琴通寧(15-11)': '//*[@id="timeTableMeetingRoom"]/div[26]/button[1]',
-    '4F-安新芽': '//*[@id="timeTableMeetingRoom"]/div[48]/button[1]',
-    '4F-微風Chill室': '//*[@id="timeTableMeetingRoom"]/div[50]/button[1]',
-    '4F-滴大地': '//*[@id="timeTableMeetingRoom"]/div[52]/button[1]',
-    '4F-光影綠谷': '//*[@id="timeTableMeetingRoom"]/div[54]/button[1]',
-    '4F-剛果秘境': '//*[@id="timeTableMeetingRoom"]/div[56]/button[1]',
-    '4F-未來綠洲': '//*[@id="timeTableMeetingRoom"]/div[58]/button[1]',
-    '4F-森林之光': '//*[@id="timeTableMeetingRoom"]/div[60]/button[1]',
-    '4F-優勝美地': '//*[@id="timeTableMeetingRoom"]/div[62]/button[1]',
-    '4F-亞馬遜雨林': '//*[@id="timeTableMeetingRoom"]/div[64]/button[1]',
+    '4F-微風Chill室': '//*[@id="timeTableMeetingRoom"]/div[48]/button[1]',
+    '4F-滴大地': '//*[@id="timeTableMeetingRoom"]/div[50]/button[1]',
+    '4F-光影綠谷': '//*[@id="timeTableMeetingRoom"]/div[52]/button[1]',
+    '4F-剛果秘境': '//*[@id="timeTableMeetingRoom"]/div[54]/button[1]',
+    '4F-未來綠洲': '//*[@id="timeTableMeetingRoom"]/div[56]/button[1]',
+    '4F-森林之光': '//*[@id="timeTableMeetingRoom"]/div[58]/button[1]',
+    '4F-優勝美地': '//*[@id="timeTableMeetingRoom"]/div[60]/button[1]',
+    '4F-亞馬遜雨林': '//*[@id="timeTableMeetingRoom"]/div[62]/button[1]',
+    '4F-安新芽': '//*[@id="timeTableMeetingRoom"]/div[64]/button[1]',
     '3F-HIVE': '//*[@id="timeTableMeetingRoom"]/div[66]/button[1]',
     '3F-Kafka': '//*[@id="timeTableMeetingRoom"]/div[68]/button[1]',
     '3F-中心樹投影3': '//*[@id="timeTableMeetingRoom"]/div[70]/button[1]',
@@ -576,7 +578,7 @@ def book_meeting_room():
     start_date = data.get('start_date', '2024/09/19')
     end_date = start_date
     meeting_subject = data.get('meeting_subject', '技術討論')
-    attendance_number = '4'
+    attendance_number = '1'
     time_from_value = data.get('time_from', '08:00')
     time_to_value = data.get('time_to', '09:00')
 
@@ -588,8 +590,8 @@ def book_meeting_room():
     # 啟動 Chrome driver - 使用 webdriver-manager
     options = webdriver.ChromeOptions()
     options.add_experimental_option("detach", True)
-    options.binary_location = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-    
+    # options.binary_location = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+    options.binary_location = "/usr/bin/google-chrome"    
     try:
         service = Service(ChromeDriverManager().install())
         driver = webdriver.Chrome(service=service, options=options)

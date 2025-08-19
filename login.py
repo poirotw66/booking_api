@@ -15,7 +15,7 @@ password = os.getenv('BOOKING_PASSWORD')
 options = webdriver.ChromeOptions()
 options.add_experimental_option("detach", True)
 # Chrome 瀏覽器路徑 (macOS)
-options.binary_location = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+options.binary_location = "/usr/bin/google-chrome"
 options.add_argument('--no-sandbox')
 options.add_argument('--disable-dev-shm-usage')
 options.add_argument('--disable-gpu')
